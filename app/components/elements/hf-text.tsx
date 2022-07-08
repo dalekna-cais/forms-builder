@@ -14,6 +14,11 @@ export const HFTextInput = ({field}: {field: FieldProps}) => {
       >
         {field.label}
       </label>
+      {field.hint && (
+        <div className="border-l-4 pl-2 mb-2 text-gray-500">
+          <p className="text-base">{field.hint}</p>
+        </div>
+      )}
       <input
         type="text"
         id={field.name}

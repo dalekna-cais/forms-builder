@@ -22,6 +22,7 @@ export type FieldInputTypes =
 export type FieldProps = {
   name: string;
   label: string;
+  hint?: string;
   type: FieldInputTypes;
   order: number;
   placeholder?: string;

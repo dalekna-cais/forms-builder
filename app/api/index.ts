@@ -26,6 +26,7 @@ const fields: JsonFieldProps = {
       email: {
         label: 'Email',
         type: 'email',
+        hint: 'must match email standards',
         order: 3,
         options: {
           deps: ['confirm-email'],
