@@ -1,8 +1,8 @@
 import type {UseFormReturn} from 'react-hook-form';
-import type {FieldProps, JsonFieldProps} from './context';
+import type {FieldProps, JsonFieldProps, SectionProps} from './context';
 import {mergeDeepRight} from 'ramda';
 
-const translateFields = (
+const transformField = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
   return (field: FieldProps, key: string) => {
@@ -26,29 +26,39 @@ const translateFields = (
   };
 };
 
-export const convertFieldsToJs = (
+const transformFields = (
+  methods?: UseFormReturn<Record<string, any>, object>,
+) => {
+  return (section: JsonFieldProps) => {
+    const fields = Object.keys(section.fields).reduce<FieldProps[]>(
+      (acc, sectionName) => {
+        const value: FieldProps = section.fields[sectionName];
+
+        const field = transformField(methods)(value, sectionName);
+
+        return [...acc, field];
+      },
+      [],
+    );
+
+    return fields;
+  };
+};
+
+export const convertJsonToSectionsWithFields = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
   return (
     json: JsonFieldProps,
-  ): {fields: FieldProps[]; defaultValues: Record<string, any>} => {
-    const fields = Object.keys(json).reduce<FieldProps[]>((acc, key) => {
-      const value: FieldProps = json[key];
+  ): {sections: SectionProps[]; defaultValues: Record<string, any>} => {
+    const sections = Object.keys(json).reduce<SectionProps[]>((acc, key) => {
+      const section: SectionProps = json[key];
 
-      const field = translateFields(methods)(value, key);
+      const fields = transformFields(methods)(section);
 
-      return [...acc, field];
+      return [...acc, {...section, fields}];
     }, []);
 
-    // default values can be taken after processing json to js
-    const defaultValues: any = fields.reduce((acc, field) => {
-      if (!field.options?.value) return acc;
-      return {
-        ...acc,
-        [field.name]: field.options?.value,
-      };
-    }, {});
-
-    return {fields, defaultValues};
+    return {sections, defaultValues: {}};
   };
 };

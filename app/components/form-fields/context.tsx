@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type {RegisterOptions, UseFormReturn} from 'react-hook-form';
-import {convertFieldsToJs} from './convertFieldsToJs';
+import {convertJsonToSectionsWithFields} from './convertFieldsToJs';
 
 export type FieldInputTypes =
   | 'text'
@@ -28,17 +28,21 @@ export type FieldProps = {
   validate?: any;
   options?: RegisterOptions<any, any>;
 };
+export type SectionProps = {
+  title: string;
+  fields: FieldProps[];
+};
 export type FormFieldsContextProps = {
   json: JsonFieldProps;
-  getFields: (methods: UseFormReturn<Record<string, any>, object>) => {
-    fields: FieldProps[];
+  getSections: (methods: UseFormReturn<Record<string, any>, object>) => {
+    sections: SectionProps[];
     defaultValues: Record<string, any>;
   };
   defaultValues: Record<string, any>;
 };
 export const FormFieldsContext = React.createContext<FormFieldsContextProps>({
   json: {},
-  getFields: () => ({fields: [], defaultValues: {}}),
+  getSections: () => ({sections: [], defaultValues: {}}),
   defaultValues: {},
 });
 
@@ -51,18 +55,18 @@ export const FormFieldsProvider = ({
   children,
   json = [],
 }: FormFieldsProviderProps) => {
-  const getFields = React.useCallback(
+  const getSections = React.useCallback(
     (methods?: UseFormReturn<Record<string, any>, object>) => {
-      return convertFieldsToJs(methods)(json);
+      return convertJsonToSectionsWithFields(methods)(json);
     },
     [json],
   );
 
   const defaultValues = React.useMemo(() => {
-    return convertFieldsToJs()(json).defaultValues;
+    return convertJsonToSectionsWithFields()(json).defaultValues;
   }, [json]);
 
-  const forwardProps = {json, getFields, defaultValues};
+  const forwardProps = {json, getSections, defaultValues};
   const ui = typeof children === 'function' ? children(forwardProps) : children;
   return (
     <FormFieldsContext.Provider value={forwardProps}>

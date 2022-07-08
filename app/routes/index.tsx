@@ -10,45 +10,75 @@ import {
 } from '~/components/form-fields';
 
 const Page = () => {
-  const {getFields, defaultValues} = useFormFieldsContext();
+  const {getSections, defaultValues} = useFormFieldsContext();
   const methods = useForm({defaultValues});
-  const formFields = getFields(methods).fields;
+  const formSections = getSections(methods).sections;
 
   return (
-    <div className="flex flex-col items-center">
-      <FormProvider {...methods}>
-        <form
-          onSubmit={methods.handleSubmit(console.log)}
-          className="flex flex-col min-w-[750px] border p-10"
-        >
-          {Object.keys(methods.formState.errors).length > 0 && (
-            <ErrorMessages errors={methods.formState.errors} />
-          )}
-          <fieldset>
-            <legend className="text-xl mb-5">Personal details:</legend>
-            {formFields
-              .sort((a, b) => a.order - b.order)
-              .map((field) => {
-                switch (field.type) {
-                  case 'text':
-                    return <HFTextInput key={field.name} field={field} />;
-                  case 'email':
-                    return <HFTextInput key={field.name} field={field} />;
-                  case 'password':
-                    return <HFPasswordInput key={field.name} field={field} />;
-                  default:
-                    throw new Error(`${field.type} is not supported`);
-                }
+    <div className="flex flex-col flex-1 items-center">
+      <div className="flex flex-row w-[1000px] min-w-[750px] border p-10">
+        <aside className="flex flex-col flex-none w-[250px] border p-10">
+          {formSections.map((section, key) => {
+            return (
+              <div key={key} className="mb-4">
+                <p className="font-semibold text-blue-500">{section.title}</p>
+                <ul className="mt-4">
+                  {section.fields.map((field) => (
+                    <li key={field.name} className="ml-4 text-base list-disc">
+                      {field.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </aside>
+        <main className="flex flex-col flex-1 items-center">
+          <FormProvider {...methods}>
+            <form
+              onSubmit={methods.handleSubmit(console.log)}
+              className="flex flex-col w-full border p-10"
+            >
+              {formSections.map((section, key) => {
+                return (
+                  <fieldset key={key} className="mb-4">
+                    <legend className="text-xl mb-5"># {section.title}</legend>
+                    {section.fields
+                      .sort((a, b) => a.order - b.order)
+                      .map((field) => {
+                        switch (field.type) {
+                          case 'text':
+                            return (
+                              <HFTextInput key={field.name} field={field} />
+                            );
+                          case 'email':
+                            return (
+                              <HFTextInput key={field.name} field={field} />
+                            );
+                          case 'password':
+                            return (
+                              <HFPasswordInput key={field.name} field={field} />
+                            );
+                          default:
+                            throw new Error(`${field.type} is not supported`);
+                        }
+                      })}
+                  </fieldset>
+                );
               })}
-          </fieldset>
-          <button
-            type="submit"
-            className="mt-6 inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-          >
-            Submit
-          </button>
-        </form>
-      </FormProvider>
+              {Object.keys(methods.formState.errors).length > 0 && (
+                <ErrorMessages errors={methods.formState.errors} />
+              )}
+              <button
+                type="submit"
+                className="mt-6 inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
+              >
+                Submit
+              </button>
+            </form>
+          </FormProvider>
+        </main>
+      </div>
     </div>
   );
 };

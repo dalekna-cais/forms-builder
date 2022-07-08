@@ -7,7 +7,7 @@ export const HFTextInput = ({field}: {field: FieldProps}) => {
   const {errors, touchedFields} = methods.formState;
 
   return (
-    <div className="mb-3 xl:w-96">
+    <div className="mb-3">
       <label
         htmlFor={field.name}
         className="form-label inline-block mb-2 text-gray-700"
