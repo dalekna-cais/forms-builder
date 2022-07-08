@@ -71,9 +71,14 @@ const fields: JsonSectionProps = {
         type: 'text',
         order: 2,
       },
-      town: {
-        label: 'Town',
-        type: 'text',
+      country: {
+        label: 'Country',
+        type: 'select',
+        items: [
+          {value: 'uk', label: 'UK'},
+          {value: 'us', label: 'US'},
+          {value: 'ca', label: 'CA'},
+        ],
         order: 3,
       },
     },

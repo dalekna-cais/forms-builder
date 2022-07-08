@@ -7,6 +7,7 @@ export type FieldInputTypes =
   | 'password'
   | 'radio'
   | 'checkbox'
+  | 'select'
   | 'file'
   | 'image'
   | 'color'
@@ -26,6 +27,7 @@ export type FieldProps = {
   type: FieldInputTypes;
   order: number;
   placeholder?: string;
+  items?: {value: any; label: string}[];
   validate?: any;
   options?: RegisterOptions<any, any>;
 };
