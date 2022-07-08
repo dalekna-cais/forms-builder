@@ -1,6 +1,6 @@
 import type {UseFormReturn} from 'react-hook-form';
-import type {FieldProps, JsonFieldProps, SectionProps} from './context';
 import {mergeDeepRight} from 'ramda';
+import type {FieldProps, JsonSectionProps, SectionProps} from './context';
 
 const transformField = (
   methods?: UseFormReturn<Record<string, any>, object>,
@@ -29,7 +29,7 @@ const transformField = (
 const transformFields = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
-  return (section: JsonFieldProps) => {
+  return (section: JsonSectionProps) => {
     const fields = Object.keys(section.fields).reduce<FieldProps[]>(
       (acc, sectionName) => {
         const value: FieldProps = section.fields[sectionName];
@@ -49,7 +49,7 @@ export const convertJsonToSectionsWithFields = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
   return (
-    json: JsonFieldProps,
+    json: JsonSectionProps,
   ): {sections: SectionProps[]; defaultValues: Record<string, any>} => {
     const sections = Object.keys(json).reduce<SectionProps[]>((acc, key) => {
       const section: SectionProps = json[key];
@@ -59,6 +59,22 @@ export const convertJsonToSectionsWithFields = (
       return [...acc, {...section, fields}];
     }, []);
 
-    return {sections, defaultValues: {}};
+    /** get default values for the react hook form */
+    const defaultValues = Object.keys(json).reduce<Record<string, any>>(
+      (_acc, key) => {
+        const section: SectionProps = json[key];
+        const result = Object.keys(section.fields).reduce((acc, fieldName) => {
+          const value: FieldProps = section.fields[fieldName as any];
+          return {
+            ...acc,
+            [fieldName]: value.options?.value ?? undefined,
+          };
+        }, {});
+        return result;
+      },
+      {},
+    );
+
+    return {sections, defaultValues};
   };
 };

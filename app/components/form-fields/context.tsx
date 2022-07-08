@@ -34,7 +34,7 @@ export type SectionProps = {
   fields: FieldProps[];
 };
 export type FormFieldsContextProps = {
-  json: JsonFieldProps;
+  json: JsonSectionProps;
   getSections: (methods: UseFormReturn<Record<string, any>, object>) => {
     sections: SectionProps[];
     defaultValues: Record<string, any>;
@@ -47,14 +47,23 @@ export const FormFieldsContext = React.createContext<FormFieldsContextProps>({
   defaultValues: {},
 });
 
-export type JsonFieldProps = Record<string, any>;
+export type JsonFieldProps = Omit<FieldProps, 'name'>;
+// export type JsonSectionProps = {
+//   [key: string]: {
+//     title: string;
+//     fields: {
+//       [name: string]: JsonFieldProps;
+//     };
+//   };
+// };
+export type JsonSectionProps = Record<string, any>;
 export interface FormFieldsProviderProps {
   children: Function | React.ReactNode;
-  json: JsonFieldProps;
+  json: JsonSectionProps;
 }
 export const FormFieldsProvider = ({
   children,
-  json = [],
+  json = {},
 }: FormFieldsProviderProps) => {
   const getSections = React.useCallback(
     (methods?: UseFormReturn<Record<string, any>, object>) => {

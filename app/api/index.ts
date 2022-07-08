@@ -1,6 +1,6 @@
-import type {JsonFieldProps} from '~/components/form-fields';
+import type {JsonSectionProps} from '~/components/form-fields';
 
-const fields: JsonFieldProps = {
+const fields: JsonSectionProps = {
   personalDetails: {
     title: 'Personal Details',
     fields: {
@@ -80,6 +80,6 @@ const fields: JsonFieldProps = {
   },
 };
 
-export const getFieldProps = (): Promise<JsonFieldProps> => {
+export const getFieldProps = (): Promise<JsonSectionProps> => {
   return new Promise((res) => setTimeout(() => res(fields), 1000));
 };

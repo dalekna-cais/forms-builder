@@ -3,7 +3,7 @@ import {useForm, FormProvider} from 'react-hook-form';
 import {getFieldProps} from '~/api';
 import {HFTextInput, HFPasswordInput} from '~/components/elements';
 import {ErrorMessages} from '~/components/elements/common';
-import type {JsonFieldProps} from '~/components/form-fields';
+import type {JsonSectionProps} from '~/components/form-fields';
 import {
   FormFieldsProvider,
   useFormFieldsContext,
@@ -36,7 +36,7 @@ const Page = () => {
         <main className="flex flex-col flex-1 items-center">
           <FormProvider {...methods}>
             <form
-              onSubmit={methods.handleSubmit(console.log)}
+              onSubmit={methods.handleSubmit((values) => console.log(values))}
               className="flex flex-col w-full border p-10"
             >
               {formSections.map((section, key) => {
@@ -84,7 +84,7 @@ const Page = () => {
 };
 
 export default function Index() {
-  const [fields, setFields] = useState<JsonFieldProps | undefined>(undefined);
+  const [fields, setFields] = useState<JsonSectionProps | undefined>(undefined);
 
   useEffect(() => {
     getFieldProps().then(setFields);
