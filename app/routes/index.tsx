@@ -10,7 +10,7 @@ import {
   HFTextInput,
 } from '~/components/elements';
 import {ErrorMessages} from '~/components/elements/common';
-import type {JsonSectionProps} from '~/components/form-fields';
+import type {JsonSchemaProps} from '~/components/form-fields';
 import {
   FormFieldsProvider,
   useFormFieldsContext,
@@ -99,7 +99,7 @@ export const loader: LoaderFunction = async () => {
 };
 
 export default function Index() {
-  const jsonFieldsDefs = useLoaderData<JsonSectionProps>();
+  const jsonFieldsDefs = useLoaderData<JsonSchemaProps>();
 
   return (
     <div className="flex flex-col flex-1 items-center">

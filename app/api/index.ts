@@ -1,6 +1,6 @@
-import type {JsonSectionProps} from '~/components/form-fields';
+import type {JsonSchemaProps} from '~/components/form-fields';
 
-const fields: JsonSectionProps = {
+const fields: JsonSchemaProps = {
   withSidebar: true,
   submit: 'Submit',
   definitions: {
@@ -121,6 +121,6 @@ const fields: JsonSectionProps = {
   },
 };
 
-export const getFieldProps = (): Promise<JsonSectionProps> => {
+export const getFieldProps = (): Promise<JsonSchemaProps> => {
   return new Promise((res) => setTimeout(() => res(fields), 1000));
 };

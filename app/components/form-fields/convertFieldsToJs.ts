@@ -5,12 +5,13 @@ import type {
   JsonSectionProps,
   JsonFieldProps,
   SectionProps,
+  JsonSchemaProps,
 } from './context';
 
 const transformField = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
-  return (field: FieldProps, key: string): FieldProps => {
+  return (field: JsonFieldProps, key: string): FieldProps => {
     const {config = {}, ...value}: JsonFieldProps = field;
     let options = {...config};
 
@@ -56,7 +57,7 @@ const transformFields = (
   return (section: JsonSectionProps): FieldProps[] => {
     const fields = Object.keys(section.fields).reduce<FieldProps[]>(
       (acc, sectionName) => {
-        const value: FieldProps = section.fields[sectionName];
+        const value: JsonFieldProps = section.fields[sectionName];
 
         const field = transformField(methods)(value, sectionName);
 
@@ -73,10 +74,10 @@ export const convertJsonToSectionsWithFields = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
   return (
-    json: JsonSectionProps,
+    defs: JsonSchemaProps['definitions'],
   ): {sections: SectionProps[]; defaultValues: Record<string, any>} => {
-    const sections = Object.keys(json).reduce<SectionProps[]>((acc, key) => {
-      const section: SectionProps = json[key];
+    const sections = Object.keys(defs).reduce<SectionProps[]>((acc, key) => {
+      const section: JsonSectionProps = defs[key];
 
       const fields = transformFields(methods)(section);
 
@@ -84,14 +85,14 @@ export const convertJsonToSectionsWithFields = (
     }, []);
 
     /** get default values for the react hook form */
-    const defaultValues = Object.keys(json).reduce<Record<string, any>>(
+    const defaultValues = Object.keys(defs).reduce<Record<string, any>>(
       (_acc, key) => {
-        const section: SectionProps = json[key];
+        const section: JsonSectionProps = defs[key];
         const result = Object.keys(section.fields).reduce((acc, fieldName) => {
-          const value: FieldProps = section.fields[fieldName as any];
+          const value: JsonFieldProps = section.fields[fieldName as any];
           return {
             ...acc,
-            [fieldName]: value.options?.value ?? undefined,
+            [fieldName]: value.config?.value ?? undefined,
           };
         }, {});
         return result;

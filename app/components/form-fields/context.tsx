@@ -28,7 +28,6 @@ export type FieldProps = {
   order: number;
   placeholder?: string;
   items?: {value: any; label: string}[];
-  // config?: any;
   options?: RegisterOptions<any, any>;
 };
 export type SectionProps = {
@@ -39,39 +38,41 @@ export type SectionProps = {
 };
 export type FormFieldsContextProps = {
   settings: Record<string, any>;
-  definitions: JsonSectionProps;
+  definitions: JsonSchemaProps['definitions'];
   getSections: (methods: UseFormReturn<Record<string, any>, object>) => {
     sections: SectionProps[];
     defaultValues: Record<string, any>;
   };
   defaultValues: Record<string, any>;
 };
-export const FormFieldsContext = React.createContext<FormFieldsContextProps>({
-  settings: {withSidebar: false},
-  definitions: {},
-  getSections: () => ({sections: [], defaultValues: {}}),
-  defaultValues: {},
-});
+export const FormFieldsContext = React.createContext<FormFieldsContextProps>(
+  null as any,
+);
 
 export interface JsonFieldProps extends Omit<FieldProps, 'name' | 'options'> {
   config?: any;
 }
-// export type JsonSectionProps = {
-//   [key: string]: {
-//     title: string;
-//     fields: {
-//       [name: string]: JsonFieldProps;
-//     };
-//   };
-// };
-export type JsonSectionProps = Record<string, any>;
+export type JsonSectionProps = {
+  title: string;
+  columns?: number;
+  fields: {
+    [key: string]: JsonFieldProps;
+  };
+};
+export type JsonSchemaProps = {
+  withSidebar?: boolean;
+  submit?: string;
+  definitions: {
+    [key: string]: JsonSectionProps;
+  };
+};
 export interface FormFieldsProviderProps {
   children: Function | React.ReactNode;
-  json: JsonSectionProps;
+  json: JsonSchemaProps;
 }
 export const FormFieldsProvider = ({
   children,
-  json = {},
+  json,
 }: FormFieldsProviderProps) => {
   const {definitions, ...settings} = json;
 
