@@ -38,7 +38,8 @@ export type SectionProps = {
   fields: FieldProps[];
 };
 export type FormFieldsContextProps = {
-  json: JsonSectionProps;
+  settings: Record<string, any>;
+  definitions: JsonSectionProps;
   getSections: (methods: UseFormReturn<Record<string, any>, object>) => {
     sections: SectionProps[];
     defaultValues: Record<string, any>;
@@ -46,7 +47,8 @@ export type FormFieldsContextProps = {
   defaultValues: Record<string, any>;
 };
 export const FormFieldsContext = React.createContext<FormFieldsContextProps>({
-  json: {},
+  settings: {withSidebar: false},
+  definitions: {},
   getSections: () => ({sections: [], defaultValues: {}}),
   defaultValues: {},
 });
@@ -69,18 +71,20 @@ export const FormFieldsProvider = ({
   children,
   json = {},
 }: FormFieldsProviderProps) => {
+  const {definitions, ...settings} = json;
+
   const getSections = React.useCallback(
     (methods?: UseFormReturn<Record<string, any>, object>) => {
-      return convertJsonToSectionsWithFields(methods)(json);
+      return convertJsonToSectionsWithFields(methods)(definitions);
     },
-    [json],
+    [definitions],
   );
 
   const defaultValues = React.useMemo(() => {
-    return convertJsonToSectionsWithFields()(json).defaultValues;
-  }, [json]);
+    return convertJsonToSectionsWithFields()(definitions).defaultValues;
+  }, [definitions]);
 
-  const forwardProps = {json, getSections, defaultValues};
+  const forwardProps = {definitions, settings, getSections, defaultValues};
   const ui = typeof children === 'function' ? children(forwardProps) : children;
   return (
     <FormFieldsContext.Provider value={forwardProps}>

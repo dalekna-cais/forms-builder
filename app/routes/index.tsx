@@ -20,7 +20,6 @@ type SidebarProps = {
   errors?: Record<string, any>;
 };
 const Sidebar = ({formSections, errors = {}}: SidebarProps) => {
-  console.log({errors});
   return (
     <aside className="flex flex-col flex-none w-[250px] border p-10">
       <div className="sticky top-5 flex flex-col">
@@ -35,12 +34,14 @@ const Sidebar = ({formSections, errors = {}}: SidebarProps) => {
               </Link>
               <ul className="mt-4">
                 {section.fields.map((field) => {
-                  const error = errors[field.name];
+                  const hasError = typeof errors[field.name] !== 'undefined';
                   return (
                     <li
                       key={field.name}
                       className={cn(
-                        `ml-4 text-base list-disc ${error && 'text-red-500'}`,
+                        `ml-4 text-base list-disc ${
+                          hasError && 'text-red-500'
+                        }`,
                       )}
                     >
                       <Link to={`#${field.name}`}>{field.label}</Link>
@@ -57,17 +58,19 @@ const Sidebar = ({formSections, errors = {}}: SidebarProps) => {
 };
 
 const Page = () => {
-  const {getSections, defaultValues} = useFormFieldsContext();
+  const {getSections, defaultValues, settings} = useFormFieldsContext();
   const methods = useForm({defaultValues});
   const formSections = getSections(methods).sections;
 
   return (
     <FormProvider {...methods}>
       <div className="flex flex-row w-full max-w-[1000px] min-w-[750px] border p-10">
-        <Sidebar
-          formSections={formSections}
-          errors={methods.formState.errors}
-        />
+        {settings.withSidebar && (
+          <Sidebar
+            formSections={formSections}
+            errors={methods.formState.errors}
+          />
+        )}
         <main className="flex flex-col flex-1 items-center">
           <form
             onSubmit={methods.handleSubmit((values) => console.log(values))}
