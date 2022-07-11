@@ -32,7 +32,9 @@ export type FieldProps = {
   options?: RegisterOptions<any, any>;
 };
 export type SectionProps = {
+  id: string;
   title: string;
+  columns?: number;
   fields: FieldProps[];
 };
 export type FormFieldsContextProps = {

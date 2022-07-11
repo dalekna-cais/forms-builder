@@ -56,7 +56,7 @@ export const convertJsonToSectionsWithFields = (
 
       const fields = transformFields(methods)(section);
 
-      return [...acc, {...section, fields}];
+      return [...acc, {...section, id: key, fields}];
     }, []);
 
     /** get default values for the react hook form */

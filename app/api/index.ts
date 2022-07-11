@@ -83,6 +83,42 @@ const fields: JsonSectionProps = {
       },
     },
   },
+  cryptoPortfolio: {
+    title: 'Crypto Portfolio',
+    columns: 2,
+    fields: {
+      coin1: {
+        label: 'Coin',
+        type: 'select',
+        items: [
+          {value: 'btc', label: 'BTC'},
+          {value: 'eth', label: 'ETH'},
+          {value: 'usdt', label: 'USDT'},
+        ],
+        order: 1,
+      },
+      quantity1: {
+        label: 'Quantity',
+        type: 'text',
+        order: 2,
+      },
+      coin2: {
+        label: 'Coin',
+        type: 'select',
+        items: [
+          {value: 'btc', label: 'BTC'},
+          {value: 'eth', label: 'ETH'},
+          {value: 'usdt', label: 'USDT'},
+        ],
+        order: 3,
+      },
+      quantity2: {
+        label: 'Quantity',
+        type: 'text',
+        order: 4,
+      },
+    },
+  },
 };
 
 export const getFieldProps = (): Promise<JsonSectionProps> => {

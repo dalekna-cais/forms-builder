@@ -7,11 +7,54 @@ import {
   HFSelectInput,
 } from '~/components/elements';
 import {ErrorMessages} from '~/components/elements/common';
-import type {JsonSectionProps} from '~/components/form-fields';
+import type {JsonSectionProps, SectionProps} from '~/components/form-fields';
 import {
   FormFieldsProvider,
   useFormFieldsContext,
 } from '~/components/form-fields';
+import cn from 'classnames';
+import {Link} from 'react-router-dom';
+
+type SidebarProps = {
+  formSections: SectionProps[];
+  errors?: Record<string, any>;
+};
+const Sidebar = ({formSections, errors = {}}: SidebarProps) => {
+  console.log({errors});
+  return (
+    <aside className="flex flex-col flex-none w-[250px] border p-10">
+      <div className="sticky top-5 flex flex-col">
+        {formSections.map((section, key) => {
+          return (
+            <div key={key} className="mb-4">
+              <Link
+                to={`#${section.id}`}
+                className="font-semibold text-blue-500"
+              >
+                {section.title}
+              </Link>
+              <ul className="mt-4">
+                {section.fields.map((field) => {
+                  const error = errors[field.name];
+                  return (
+                    <li
+                      key={field.name}
+                      className={cn(
+                        `ml-4 text-base list-disc ${error && 'text-red-500'}`,
+                      )}
+                    >
+                      <Link to={`#${field.name}`}>{field.label}</Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </aside>
+  );
+};
 
 const Page = () => {
   const {getSections, defaultValues} = useFormFieldsContext();
@@ -19,55 +62,55 @@ const Page = () => {
   const formSections = getSections(methods).sections;
 
   return (
-    <div className="flex flex-row w-full max-w-[1000px] min-w-[750px] border p-10">
-      <aside className="flex flex-col flex-none w-[250px] border p-10">
-        <div className="sticky top-5 flex flex-col">
-          {formSections.map((section, key) => {
-            return (
-              <div key={key} className="mb-4">
-                <p className="font-semibold text-blue-500">{section.title}</p>
-                <ul className="mt-4">
-                  {section.fields.map((field) => (
-                    <li key={field.name} className="ml-4 text-base list-disc">
-                      {field.label}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-      </aside>
-      <main className="flex flex-col flex-1 items-center">
-        <FormProvider {...methods}>
+    <FormProvider {...methods}>
+      <div className="flex flex-row w-full max-w-[1000px] min-w-[750px] border p-10">
+        <Sidebar
+          formSections={formSections}
+          errors={methods.formState.errors}
+        />
+        <main className="flex flex-col flex-1 items-center">
           <form
             onSubmit={methods.handleSubmit((values) => console.log(values))}
             className="flex flex-col w-full border p-10"
           >
-            {formSections.map((section, key) => {
+            {formSections.map((section) => {
               return (
-                <fieldset key={key} className="mb-4">
-                  <legend className="text-xl mb-5"># {section.title}</legend>
-                  {section.fields
-                    .sort((a, b) => a.order - b.order)
-                    .map((field) => {
-                      switch (field.type) {
-                        case 'text':
-                          return <HFTextInput key={field.name} field={field} />;
-                        case 'email':
-                          return <HFTextInput key={field.name} field={field} />;
-                        case 'select':
-                          return (
-                            <HFSelectInput key={field.name} field={field} />
-                          );
-                        case 'password':
-                          return (
-                            <HFPasswordInput key={field.name} field={field} />
-                          );
-                        default:
-                          throw new Error(`${field.type} is not supported`);
-                      }
-                    })}
+                <fieldset key={section.id} className="mb-6">
+                  {section.title && (
+                    <legend id={section.id} className="text-xl mb-4">
+                      # {section.title}
+                    </legend>
+                  )}
+                  <div
+                    className={cn(
+                      `grid grid-cols-${section.columns ?? 1} gap-4`,
+                    )}
+                  >
+                    {section.fields
+                      .sort((a, b) => a.order - b.order)
+                      .map((field) => {
+                        switch (field.type) {
+                          case 'text':
+                            return (
+                              <HFTextInput key={field.name} field={field} />
+                            );
+                          case 'email':
+                            return (
+                              <HFTextInput key={field.name} field={field} />
+                            );
+                          case 'select':
+                            return (
+                              <HFSelectInput key={field.name} field={field} />
+                            );
+                          case 'password':
+                            return (
+                              <HFPasswordInput key={field.name} field={field} />
+                            );
+                          default:
+                            throw new Error(`${field.type} is not supported`);
+                        }
+                      })}
+                  </div>
                 </fieldset>
               );
             })}
@@ -81,9 +124,9 @@ const Page = () => {
               Submit
             </button>
           </form>
-        </FormProvider>
-      </main>
-    </div>
+        </main>
+      </div>
+    </FormProvider>
   );
 };
 

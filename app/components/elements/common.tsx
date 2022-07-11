@@ -1,3 +1,5 @@
+import type {PropsWithChildren} from 'react';
+
 export const ErrorMessage = ({error}: {error: any}) => {
   return (
     <span role="alert" className="mt-2 text-sm text-red-700">
@@ -22,4 +24,8 @@ export const ErrorMessages = ({errors}: {errors: Record<string, any>}) => {
       })}
     </div>
   );
+};
+
+export const FieldSection = ({children}: PropsWithChildren) => {
+  return <div className="w-full">{children}</div>;
 };

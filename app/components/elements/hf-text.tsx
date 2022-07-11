@@ -1,13 +1,13 @@
 import type {FieldProps} from '../form-fields';
 import {useFormContext} from 'react-hook-form';
-import {ErrorMessage} from './common';
+import {ErrorMessage, FieldSection} from './common';
 
 export const HFTextInput = ({field}: {field: FieldProps}) => {
   const methods = useFormContext();
-  const {errors, touchedFields} = methods.formState;
+  const {errors} = methods.formState;
 
   return (
-    <div className="mb-3">
+    <FieldSection>
       <label
         htmlFor={field.name}
         className="form-label inline-block mb-2 text-gray-700"
@@ -27,9 +27,7 @@ export const HFTextInput = ({field}: {field: FieldProps}) => {
         {...methods.register(field.name, field.options)}
         className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
       />
-      {errors[field.name] && touchedFields[field.name] && (
-        <ErrorMessage error={errors[field.name]} />
-      )}
-    </div>
+      {errors[field.name] && <ErrorMessage error={errors[field.name]} />}
+    </FieldSection>
   );
 };
