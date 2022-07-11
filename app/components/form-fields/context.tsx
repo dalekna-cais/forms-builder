@@ -28,7 +28,7 @@ export type FieldProps = {
   order: number;
   placeholder?: string;
   items?: {value: any; label: string}[];
-  validate?: any;
+  // config?: any;
   options?: RegisterOptions<any, any>;
 };
 export type SectionProps = {
@@ -53,7 +53,9 @@ export const FormFieldsContext = React.createContext<FormFieldsContextProps>({
   defaultValues: {},
 });
 
-export type JsonFieldProps = Omit<FieldProps, 'name'>;
+export interface JsonFieldProps extends Omit<FieldProps, 'name' | 'options'> {
+  config?: any;
+}
 // export type JsonSectionProps = {
 //   [key: string]: {
 //     title: string;

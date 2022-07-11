@@ -1,61 +1,21 @@
-import {useEffect, useState} from 'react';
-import {useForm, FormProvider} from 'react-hook-form';
+import type {LoaderFunction} from '@remix-run/node';
+import {json} from '@remix-run/node';
+import {useLoaderData} from '@remix-run/react';
+import cn from 'classnames';
+import {FormProvider, useForm} from 'react-hook-form';
 import {getFieldProps} from '~/api';
 import {
-  HFTextInput,
   HFPasswordInput,
   HFSelectInput,
+  HFTextInput,
 } from '~/components/elements';
 import {ErrorMessages} from '~/components/elements/common';
-import type {JsonSectionProps, SectionProps} from '~/components/form-fields';
+import type {JsonSectionProps} from '~/components/form-fields';
 import {
   FormFieldsProvider,
   useFormFieldsContext,
 } from '~/components/form-fields';
-import cn from 'classnames';
-import {Link} from 'react-router-dom';
-
-type SidebarProps = {
-  formSections: SectionProps[];
-  errors?: Record<string, any>;
-};
-const Sidebar = ({formSections, errors = {}}: SidebarProps) => {
-  return (
-    <aside className="flex flex-col flex-none w-[250px] border p-10">
-      <div className="sticky top-5 flex flex-col">
-        {formSections.map((section, key) => {
-          return (
-            <div key={key} className="mb-4">
-              <Link
-                to={`#${section.id}`}
-                className="font-semibold text-blue-500"
-              >
-                {section.title}
-              </Link>
-              <ul className="mt-4">
-                {section.fields.map((field) => {
-                  const hasError = typeof errors[field.name] !== 'undefined';
-                  return (
-                    <li
-                      key={field.name}
-                      className={cn(
-                        `ml-4 text-base list-disc ${
-                          hasError && 'text-red-500'
-                        }`,
-                      )}
-                    >
-                      <Link to={`#${field.name}`}>{field.label}</Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-    </aside>
-  );
-};
+import {Sidebar} from '~/components/sidebar';
 
 const Page = () => {
   const {getSections, defaultValues, settings} = useFormFieldsContext();
@@ -124,7 +84,7 @@ const Page = () => {
               type="submit"
               className="mt-6 inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
             >
-              Submit
+              {settings.submit}
             </button>
           </form>
         </main>
@@ -133,20 +93,17 @@ const Page = () => {
   );
 };
 
+export const loader: LoaderFunction = async () => {
+  const response = await getFieldProps();
+  return json(response);
+};
+
 export default function Index() {
-  const [fields, setFields] = useState<JsonSectionProps | undefined>(undefined);
-
-  useEffect(() => {
-    getFieldProps().then(setFields);
-  }, []);
-
-  if (!fields) {
-    return <div className="flex flex-col items-center">Loading...</div>;
-  }
+  const jsonFieldsDefs = useLoaderData<JsonSectionProps>();
 
   return (
     <div className="flex flex-col flex-1 items-center">
-      <FormFieldsProvider json={fields}>
+      <FormFieldsProvider json={jsonFieldsDefs}>
         <Page />
       </FormFieldsProvider>
     </div>

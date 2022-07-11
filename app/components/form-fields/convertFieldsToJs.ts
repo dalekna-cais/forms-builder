@@ -1,35 +1,59 @@
 import type {UseFormReturn} from 'react-hook-form';
 import {mergeDeepRight} from 'ramda';
-import type {FieldProps, JsonSectionProps, SectionProps} from './context';
+import type {
+  FieldProps,
+  JsonSectionProps,
+  JsonFieldProps,
+  SectionProps,
+} from './context';
 
 const transformField = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
-  return (field: FieldProps, key: string) => {
-    const {validate, ...value}: Omit<FieldProps, 'name'> = field;
+  return (field: FieldProps, key: string): FieldProps => {
+    const {config = {}, ...value}: JsonFieldProps = field;
+    let options = {...config};
 
-    if (validate && validate.isAMatch) {
-      value.options = mergeDeepRight(value.options ?? {}, {
+    // TODO: could have an object with all props to match
+    // Object.keys(config).forEach(key => {
+    //   options = mergeDeepRight(options, dictionary[key])
+    // })
+
+    if ('isAMatch' in config) {
+      const isAMatch = config.isAMatch;
+
+      options = mergeDeepRight(options, {
         validate: {
           isAMatch: (val: string) => {
-            const isAMatch = validate.isAMatch;
             return (
               val?.toLowerCase() ===
-                methods?.watch(isAMatch.with)?.toLowerCase() || isAMatch.message
+                methods?.watch(isAMatch.field)?.toLowerCase() ||
+              isAMatch.message
             );
           },
         },
       });
     }
 
-    return {...value, name: key};
+    if ('pattern' in config) {
+      const pattern = config.pattern;
+
+      options = mergeDeepRight(options, {
+        pattern: {
+          value: new RegExp(pattern.value),
+          message: pattern.message,
+        },
+      });
+    }
+
+    return {...value, options, name: key};
   };
 };
 
 const transformFields = (
   methods?: UseFormReturn<Record<string, any>, object>,
 ) => {
-  return (section: JsonSectionProps) => {
+  return (section: JsonSectionProps): FieldProps[] => {
     const fields = Object.keys(section.fields).reduce<FieldProps[]>(
       (acc, sectionName) => {
         const value: FieldProps = section.fields[sectionName];

@@ -2,6 +2,7 @@ import type {JsonSectionProps} from '~/components/form-fields';
 
 const fields: JsonSectionProps = {
   withSidebar: true,
+  submit: 'Submit',
   definitions: {
     personalDetails: {
       title: 'Personal Details',
@@ -10,7 +11,7 @@ const fields: JsonSectionProps = {
           label: 'Name',
           type: 'text',
           order: 1,
-          options: {
+          config: {
             required: {
               value: true,
               message: 'name is required',
@@ -21,7 +22,7 @@ const fields: JsonSectionProps = {
           label: 'Surname',
           type: 'text',
           order: 2,
-          options: {
+          config: {
             value: 'testing default value',
           },
         },
@@ -30,12 +31,12 @@ const fields: JsonSectionProps = {
           type: 'email',
           hint: 'must match email standards',
           order: 3,
-          options: {
-            deps: ['confirm-email'],
+          config: {
             pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,}$/i,
+              value: '/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,}$/i',
               message: 'invalid email format',
             },
+            deps: ['confirm-email'],
             required: {
               value: true,
               message: 'emails did not match',
@@ -46,15 +47,11 @@ const fields: JsonSectionProps = {
           label: 'Confirm Email',
           type: 'email',
           order: 4,
-          // validate is extracted from options and applied later because
-          // of objects getting cloned with refs
-          validate: {
+          config: {
             isAMatch: {
-              with: 'email',
+              field: 'email',
               message: 'The emails do not match',
             },
-          },
-          options: {
             deps: ['email'],
           },
         },
