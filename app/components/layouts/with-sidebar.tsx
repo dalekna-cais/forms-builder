@@ -1,11 +1,5 @@
-import cn from 'classnames';
 import {FormProvider, useForm} from 'react-hook-form';
-import {
-  HFPasswordInput,
-  HFSelectInput,
-  HFTextInput,
-} from '~/components/elements';
-import {ErrorMessages} from '~/components/elements/common';
+import {ErrorMessages, FieldsMatcher} from '~/components/elements/common';
 import {useFormFieldsContext} from '~/components/form-fields';
 import {Sidebar} from '~/components/sidebar';
 
@@ -36,36 +30,7 @@ export const DefaultWithSidebar = ({withSidebar}: {withSidebar: boolean}) => {
                       # {section.title}
                     </legend>
                   )}
-                  <div
-                    className={cn(
-                      `grid grid-cols-${section.columns ?? 1} gap-4`,
-                    )}
-                  >
-                    {section.fields
-                      .sort((a, b) => a.order - b.order)
-                      .map((field) => {
-                        switch (field.type) {
-                          case 'text':
-                            return (
-                              <HFTextInput key={field.name} field={field} />
-                            );
-                          case 'email':
-                            return (
-                              <HFTextInput key={field.name} field={field} />
-                            );
-                          case 'select':
-                            return (
-                              <HFSelectInput key={field.name} field={field} />
-                            );
-                          case 'password':
-                            return (
-                              <HFPasswordInput key={field.name} field={field} />
-                            );
-                          default:
-                            throw new Error(`${field.type} is not supported`);
-                        }
-                      })}
-                  </div>
+                  <FieldsMatcher section={section} />
                 </fieldset>
               );
             })}

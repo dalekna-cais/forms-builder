@@ -1,66 +1,50 @@
 import * as React from 'react';
 import type {JsonSectionProps} from '../form-fields';
 import {useFormFieldsContext} from '../form-fields';
+import cn from 'classnames';
+import {FormProvider, useForm} from 'react-hook-form';
+import {FieldsMatcher} from '../elements/common';
 
 const Form = ({defs}: {defs: JsonSectionProps}) => {
+  const {getSections, defaultValuesPerSection} = useFormFieldsContext();
+  const methods = useForm({defaultValues: defaultValuesPerSection[defs.title]}); // should be defs.id, not title.
+  const formSections = getSections(methods).sections;
+  const section = formSections.find((section) => section.title === defs.title);
+
+  if (!section)
+    return <div>there was an error looking up section by title!</div>;
+
   return (
-    <>
-      <div className="mt-5">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam
-        aspernatur voluptatibus sapiente, et minus exercitationem facere at
-        deserunt molestiae aliquam, beatae aut commodi. Iste repudiandae
-        molestias nihil in necessitatibus cumque, sequi impedit suscipit
-        architecto nulla minus perferendis neque alias ipsum illum dolorum eum
-        voluptas quam obcaecati ex aspernatur fugiat nisi! Fugiat vitae ducimus
-        numquam accusantium autem architecto error iusto itaque at molestiae!
-        Nostrum veritatis sunt consectetur distinctio? Odio, facilis laboriosam
-        autem provident reprehenderit et possimus nostrum sed. Ducimus, illo
-        temporibus magnam debitis aliquam voluptatem autem suscipit at eveniet
-        nihil, quo a eos tempora odit quisquam nostrum corrupti! Voluptate modi
-        voluptatum tempore. Quam error ut molestias consequuntur labore iure
-        minima explicabo suscipit deserunt aliquid asperiores fugiat cupiditate
-        odit itaque earum fugit laborum mollitia illum, deleniti sequi. Qui
-        molestiae iusto atque amet animi minus sint eligendi obcaecati odio cum
-        doloribus totam laudantium fugit distinctio iure officiis suscipit,
-        accusantium dignissimos dolore incidunt sunt quasi quisquam! Placeat
-        numquam ab quo earum culpa ratione facilis! Vero, eaque. Nemo obcaecati
-        delectus voluptate quaerat autem! Laudantium consectetur odio,
-        exercitationem tempore, pariatur, officia atque odit consequuntur
-        impedit nobis nostrum dolor tempora eaque illum dignissimos. Facilis
-        doloribus obcaecati a error, consequuntur, voluptatum ratione pariatur
-        fuga alias magnam aperiam voluptate quis deserunt quasi optio sed ex
-        amet officiis. Alias labore porro esse deserunt similique, perferendis
-        dicta commodi veritatis pariatur, est, quis ducimus magni nisi ut
-        quisquam libero non officia assumenda facere. Beatae atque quia nesciunt
-        provident alias ipsa. Nostrum ducimus officiis rerum delectus atque
-        repellendus ea consectetur obcaecati ut porro veniam facilis aspernatur
-        sit enim qui deserunt, iusto doloribus tenetur molestias illum minus
-        expedita? Rerum accusamus, quod ut neque eveniet ullam vero amet, porro
-        repellat mollitia deleniti officia enim. At voluptates reprehenderit
-        laboriosam optio eos. Dolore alias ratione ex aperiam, debitis ipsam at
-        repellat, non atque quod quasi. Mollitia, veritatis!
-      </div>
-      <footer className="flex my-5">
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-        >
-          Cancel
-        </button>
-      </footer>
-    </>
+    <FormProvider {...methods}>
+      <form onSubmit={methods.handleSubmit((values) => console.log(values))}>
+        <div className="mt-5">
+          <FieldsMatcher section={section} />
+        </div>
+        <footer className="flex my-5">
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+          >
+            Next
+          </button>
+          <button
+            type="button"
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+          >
+            Cancel
+          </button>
+        </footer>
+      </form>
+    </FormProvider>
   );
 };
 
 const Section = ({defs, count}: {defs: JsonSectionProps; count: number}) => {
   const {definitions} = useFormFieldsContext();
   const [open, setOpen] = React.useState<boolean>(false);
+  const isNotLast = Object.keys(definitions).length !== count;
+
+  // NOTE: only one form can be open at a time, come up with a dynamic state machine
 
   return (
     <div key={defs.title} className="flex">
@@ -68,15 +52,19 @@ const Section = ({defs, count}: {defs: JsonSectionProps; count: number}) => {
         <div className="flex flex-none items-center justify-center border rounded-full border-gray-400 w-12 h-12">
           <h1 className="text-xl font-semibold">{count}</h1>
         </div>
-        {Object.keys(definitions).length !== count && (
+        {isNotLast && (
           <div className="h-full border-dotted border-l-2 border-gray-400"></div>
         )}
       </aside>
       <div className="flex flex-col flex-auto">
         <div className="flex items-center h-12">
-          <h1 className="text-xl font-semibold">{defs.title}</h1>
+          <h1 className="text-xl font-semibold" onClick={() => setOpen(!open)}>
+            {defs.title}
+          </h1>
         </div>
-        <div className="min-h-[20px]">{open && <Form defs={defs} />}</div>
+        <div className={cn(isNotLast && 'min-h-[24px]')}>
+          {open && <Form defs={defs} />}
+        </div>
       </div>
     </div>
   );

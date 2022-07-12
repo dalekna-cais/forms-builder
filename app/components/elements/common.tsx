@@ -1,4 +1,9 @@
 import type {PropsWithChildren} from 'react';
+import type {SectionProps} from '../form-fields';
+import cn from 'classnames';
+import {HFTextInput} from './hf-text';
+import {HFSelectInput} from './hf-select';
+import {HFPasswordInput} from './hf-password';
 
 export const ErrorMessage = ({error}: {error: any}) => {
   return (
@@ -28,4 +33,27 @@ export const ErrorMessages = ({errors}: {errors: Record<string, any>}) => {
 
 export const FieldSection = ({children}: PropsWithChildren) => {
   return <div className="w-full">{children}</div>;
+};
+
+export const FieldsMatcher = ({section}: {section: SectionProps}) => {
+  return (
+    <div className={cn(`grid grid-cols-${section.columns ?? 1} gap-4`)}>
+      {section.fields
+        .sort((a, b) => a.order - b.order)
+        .map((field) => {
+          switch (field.type) {
+            case 'text':
+              return <HFTextInput key={field.name} field={field} />;
+            case 'email':
+              return <HFTextInput key={field.name} field={field} />;
+            case 'select':
+              return <HFSelectInput key={field.name} field={field} />;
+            case 'password':
+              return <HFPasswordInput key={field.name} field={field} />;
+            default:
+              throw new Error(`${field.type} is not supported`);
+          }
+        })}
+    </div>
+  );
 };

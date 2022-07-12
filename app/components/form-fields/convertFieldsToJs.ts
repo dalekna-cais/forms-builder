@@ -75,7 +75,11 @@ export const convertJsonToSectionsWithFields = (
 ) => {
   return (
     defs: JsonSchemaProps['definitions'],
-  ): {sections: SectionProps[]; defaultValues: Record<string, any>} => {
+  ): {
+    sections: SectionProps[];
+    defaultValues: Record<string, any>;
+    defaultValuesPerSection: Record<string, any>;
+  } => {
     const sections = Object.keys(defs).reduce<SectionProps[]>((acc, key) => {
       const section: JsonSectionProps = defs[key];
 
@@ -92,6 +96,19 @@ export const convertJsonToSectionsWithFields = (
       .flat()
       .reduce((acc, val) => ({...acc, ...val}), {});
 
-    return {sections, defaultValues};
+    // NOTE: section.title should be section.id but need to find a way to initally get the id as it doesn't exist on the json
+    const defaultValuesPerSection = sections
+      .map((section) => ({
+        [section.title]: section.fields.reduce(
+          (acc, field) => ({
+            ...acc,
+            [field.name]: field.options?.value,
+          }),
+          {},
+        ),
+      }))
+      .reduce((acc, val) => ({...acc, ...val}), {});
+
+    return {sections, defaultValues, defaultValuesPerSection};
   };
 };

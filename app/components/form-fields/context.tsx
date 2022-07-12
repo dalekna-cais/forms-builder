@@ -44,6 +44,7 @@ export type FormFieldsContextProps = {
     defaultValues: Record<string, any>;
   };
   defaultValues: Record<string, any>;
+  defaultValuesPerSection: Record<string, any>;
 };
 export const FormFieldsContext = React.createContext<FormFieldsContextProps>(
   null as any,
@@ -89,6 +90,7 @@ export const FormFieldsProvider = ({
     settings,
     getSections,
     defaultValues: getSections().defaultValues,
+    defaultValuesPerSection: getSections().defaultValuesPerSection,
   };
   const ui = typeof children === 'function' ? children(forwardProps) : children;
   return (
