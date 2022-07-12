@@ -83,11 +83,12 @@ export const FormFieldsProvider = ({
     [definitions],
   );
 
-  const defaultValues = React.useMemo(() => {
-    return convertJsonToSectionsWithFields()(definitions).defaultValues;
-  }, [definitions]);
-
-  const forwardProps = {definitions, settings, getSections, defaultValues};
+  const forwardProps = {
+    definitions,
+    settings,
+    getSections,
+    defaultValues: getSections().defaultValues,
+  };
   const ui = typeof children === 'function' ? children(forwardProps) : children;
   return (
     <FormFieldsContext.Provider value={forwardProps}>

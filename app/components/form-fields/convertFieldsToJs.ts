@@ -41,7 +41,7 @@ const transformField = (
 
       options = mergeDeepRight(options, {
         pattern: {
-          value: new RegExp(pattern.value),
+          value: pattern.value, // convert string regex to regex
           message: pattern.message,
         },
       });
@@ -85,20 +85,12 @@ export const convertJsonToSectionsWithFields = (
     }, []);
 
     /** get default values for the react hook form */
-    const defaultValues = Object.keys(defs).reduce<Record<string, any>>(
-      (_acc, key) => {
-        const section: JsonSectionProps = defs[key];
-        const result = Object.keys(section.fields).reduce((acc, fieldName) => {
-          const value: JsonFieldProps = section.fields[fieldName as any];
-          return {
-            ...acc,
-            [fieldName]: value.config?.value ?? undefined,
-          };
-        }, {});
-        return result;
-      },
-      {},
-    );
+    const defaultValues = sections
+      .map((section) =>
+        section.fields.map((field) => ({[field.name]: field.options?.value})),
+      )
+      .flat()
+      .reduce((acc, val) => ({...acc, ...val}), {});
 
     return {sections, defaultValues};
   };

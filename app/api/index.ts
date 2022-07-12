@@ -78,6 +78,9 @@ const fields: JsonSchemaProps = {
             {value: 'us', label: 'US'},
             {value: 'ca', label: 'CA'},
           ],
+          config: {
+            value: 'uk',
+          },
           order: 3,
         },
       },
