@@ -1,7 +1,7 @@
 import type {JsonSchemaProps} from '~/components/form-fields';
 
 const fields: JsonSchemaProps = {
-  layout: 'with-sidebar',
+  layout: 'multistep-vertical',
   submit: 'Submit',
   definitions: {
     personalDetails: {

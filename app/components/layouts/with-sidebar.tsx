@@ -9,7 +9,7 @@ import {ErrorMessages} from '~/components/elements/common';
 import {useFormFieldsContext} from '~/components/form-fields';
 import {Sidebar} from '~/components/sidebar';
 
-export const DefaultWithSidebar = () => {
+export const DefaultWithSidebar = ({withSidebar}: {withSidebar: boolean}) => {
   const {getSections, defaultValues, settings} = useFormFieldsContext();
   const methods = useForm({defaultValues});
   const formSections = getSections(methods).sections;
@@ -17,7 +17,7 @@ export const DefaultWithSidebar = () => {
   return (
     <FormProvider {...methods}>
       <div className="flex flex-row w-full max-w-[1000px] min-w-[750px] border p-10">
-        {settings.layout === 'with-sidebar' && (
+        {withSidebar && (
           <Sidebar
             formSections={formSections}
             errors={methods.formState.errors}

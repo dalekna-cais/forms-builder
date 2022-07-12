@@ -7,17 +7,18 @@ import {
   FormFieldsProvider,
   useFormFieldsContext,
 } from '~/components/form-fields';
-import {DefaultWithSidebar} from '~/components/layouts';
+import {DefaultWithSidebar, MultistepVertical} from '~/components/layouts';
 
 const Layout = () => {
   const {settings} = useFormFieldsContext();
 
   switch (settings.layout) {
     case 'default':
+      return <DefaultWithSidebar withSidebar={false} />;
     case 'with-sidebar':
-      return <DefaultWithSidebar />;
+      return <DefaultWithSidebar withSidebar={true} />;
     case 'multistep-vertical':
-      return <div>multistep-vertical form</div>;
+      return <MultistepVertical />;
     default:
       throw new Error('Unknown layout!');
   }

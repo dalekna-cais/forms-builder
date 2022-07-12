@@ -59,8 +59,9 @@ export type JsonSectionProps = {
     [key: string]: JsonFieldProps;
   };
 };
+export type FormLayouts = 'default' | 'with-sidebar' | 'multistep-vertical';
 export type JsonSchemaProps = {
-  layout: 'default' | 'with-sidebar' | 'multistep-vertical';
+  layout: FormLayouts;
   submit?: string;
   definitions: {
     [key: string]: JsonSectionProps;
