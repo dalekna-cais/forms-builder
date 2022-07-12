@@ -26,6 +26,8 @@ export type FieldProps = {
   hint?: string;
   type: FieldInputTypes;
   order: number;
+  /** specify grid props for fields positioning */
+  className?: string;
   placeholder?: string;
   items?: {value: any; label: string}[];
   options?: RegisterOptions<any, any>;

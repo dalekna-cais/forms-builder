@@ -31,8 +31,11 @@ export const ErrorMessages = ({errors}: {errors: Record<string, any>}) => {
   );
 };
 
-export const FieldSection = ({children}: PropsWithChildren) => {
-  return <div className="w-full">{children}</div>;
+export const FieldSection = ({
+  children,
+  className,
+}: PropsWithChildren<{className?: string}>) => {
+  return <div className={cn('w-full', className)}>{children}</div>;
 };
 
 export const FieldsMatcher = ({section}: {section: SectionProps}) => {

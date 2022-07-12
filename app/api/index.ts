@@ -6,6 +6,7 @@ const fields: JsonSchemaProps = {
   definitions: {
     personalDetails: {
       title: 'Personal Details',
+      columns: 2,
       fields: {
         name: {
           label: 'Name',
@@ -30,6 +31,7 @@ const fields: JsonSchemaProps = {
           label: 'Email',
           type: 'email',
           hint: 'must match email standards',
+          className: 'col-span-2',
           order: 3,
           config: {
             pattern: {
@@ -46,6 +48,7 @@ const fields: JsonSchemaProps = {
         'confirm-email': {
           label: 'Confirm Email',
           type: 'email',
+          className: 'col-span-2',
           order: 4,
           config: {
             isAMatch: {

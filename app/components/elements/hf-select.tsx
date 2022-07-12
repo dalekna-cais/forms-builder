@@ -9,7 +9,7 @@ export const HFSelectInput = ({field}: {field: FieldProps}) => {
   const {errors} = methods.formState;
 
   return (
-    <FieldSection>
+    <FieldSection className={field.className}>
       <Controller
         name={field.name}
         control={methods.control}

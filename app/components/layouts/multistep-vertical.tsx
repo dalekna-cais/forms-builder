@@ -5,8 +5,11 @@ import cn from 'classnames';
 import {FormProvider, useForm} from 'react-hook-form';
 import {FieldsMatcher} from '../elements/common';
 
+// QUESTION: do we submit to db on each step or is there a final submit?
+
 const Form = ({defs}: {defs: JsonSectionProps}) => {
   const {getSections, defaultValuesPerSection} = useFormFieldsContext();
+  // NOTE: most likely defaultValues will come from the parent master state
   const methods = useForm({defaultValues: defaultValuesPerSection[defs.title]}); // should be defs.id, not title.
   const formSections = getSections(methods).sections;
   const section = formSections.find((section) => section.title === defs.title);
@@ -17,13 +20,13 @@ const Form = ({defs}: {defs: JsonSectionProps}) => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit((values) => console.log(values))}>
-        <div className="mt-5">
+        <div className="mt-5 max-w-[70%]">
           <FieldsMatcher section={section} />
         </div>
         <footer className="flex my-5">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3"
           >
             Next
           </button>
