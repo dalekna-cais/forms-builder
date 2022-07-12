@@ -37,7 +37,7 @@ export type SectionProps = {
   fields: FieldProps[];
 };
 export type FormFieldsContextProps = {
-  settings: Record<string, any>;
+  settings: Omit<JsonSchemaProps, 'definitions'>;
   definitions: JsonSchemaProps['definitions'];
   getSections: (methods: UseFormReturn<Record<string, any>, object>) => {
     sections: SectionProps[];
@@ -60,7 +60,7 @@ export type JsonSectionProps = {
   };
 };
 export type JsonSchemaProps = {
-  withSidebar?: boolean;
+  layout: 'default' | 'with-sidebar' | 'multistep-vertical';
   submit?: string;
   definitions: {
     [key: string]: JsonSectionProps;
