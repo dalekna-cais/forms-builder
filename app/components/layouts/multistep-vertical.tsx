@@ -5,6 +5,7 @@ import cn from 'classnames';
 import {FormProvider, useForm} from 'react-hook-form';
 import {FieldsMatcher} from '../elements/common';
 import {MultistepProvider, useMultistepActor} from '~/contexts/multistep-form';
+import {sleep} from '~/api';
 
 type FormProps = {defs: JsonSectionProps};
 const Form = ({defs}: FormProps) => {
@@ -12,7 +13,7 @@ const Form = ({defs}: FormProps) => {
   const {getSections, defaultValuesPerSection} = useFormFieldsContext();
   // default values loaded from state machine and matched with section fields
   const [defaultValues] = React.useState(() =>
-    // FIX: should look up by defs.id, not title.
+    // TODO: should look up by defs.id, not title.
     Object.keys(defaultValuesPerSection[defs.title]).reduce(
       (acc, key) => ({
         ...acc,
@@ -112,7 +113,9 @@ const MultistepForm = () => {
 
 export const MultistepVertical = () => {
   return (
-    <MultistepProvider>
+    <MultistepProvider
+      onSubmit={(values) => sleep(2500).then(() => console.log({values}))}
+    >
       <MultistepForm />
     </MultistepProvider>
   );

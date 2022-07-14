@@ -3,7 +3,6 @@ import {useActor, useMachine} from '@xstate/react';
 import type {ActorRef, State} from 'xstate';
 import {assign, createMachine} from 'xstate';
 import {useFormFieldsContext} from '../form-fields';
-import {sleep} from '~/api';
 
 export type MultistepContextProps = {
   service: any;
@@ -14,8 +13,12 @@ export const MultistepContext = React.createContext<MultistepContextProps>(
 
 export interface MultistepProviderProps {
   children: Function | React.ReactNode;
+  onSubmit: (context: any) => Promise<any>;
 }
-export const MultistepProvider = ({children}: MultistepProviderProps) => {
+export const MultistepProvider = ({
+  children,
+  onSubmit,
+}: MultistepProviderProps) => {
   const {definitions, defaultValues} = useFormFieldsContext();
   const formNames = Object.keys(definitions);
   const [fieldStates] = React.useState(() =>
@@ -50,13 +53,13 @@ export const MultistepProvider = ({children}: MultistepProviderProps) => {
           submitting: {
             entry: [() => console.log('submitting')],
             invoke: {
-              src: 'handleSubmit',
+              src: 'onSubmit',
               onDone: 'complete',
               onError: 'error',
             },
           },
           complete: {
-            entry: [(context) => console.log('complete', context)],
+            entry: [() => console.log('complete')],
           },
           error: {
             entry: [() => console.log('error')],
@@ -65,7 +68,7 @@ export const MultistepProvider = ({children}: MultistepProviderProps) => {
       },
       {
         services: {
-          handleSubmit: async () => sleep(2500),
+          onSubmit,
         },
       },
     ),
