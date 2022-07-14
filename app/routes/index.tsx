@@ -2,11 +2,8 @@ import type {LoaderFunction} from '@remix-run/node';
 import {json} from '@remix-run/node';
 import {useLoaderData} from '@remix-run/react';
 import {getFieldProps} from '~/api';
-import type {JsonSchemaProps} from '~/components/form-fields';
-import {
-  FormFieldsProvider,
-  useFormFieldsContext,
-} from '~/components/form-fields';
+import type {JsonSchemaProps} from '~/contexts/form-fields';
+import {FormFieldsProvider, useFormFieldsContext} from '~/contexts/form-fields';
 import {DefaultWithSidebar, MultistepVertical} from '~/components/layouts';
 
 const Layout = () => {

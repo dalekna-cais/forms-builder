@@ -1,5 +1,5 @@
 import Downshift from 'downshift';
-import type {FieldProps} from '../form-fields';
+import type {FieldProps} from '../../contexts/form-fields';
 import {useFormContext, Controller} from 'react-hook-form';
 import {ErrorMessage, FieldSection} from './common';
 import cn from 'classnames';

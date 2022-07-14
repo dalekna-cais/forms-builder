@@ -1,4 +1,7 @@
-import type {JsonSchemaProps} from '~/components/form-fields';
+import type {JsonSchemaProps} from '~/contexts/form-fields';
+
+export const sleep = (ms: number = 1000) =>
+  new Promise((res) => setTimeout(res, ms));
 
 const fields: JsonSchemaProps = {
   layout: 'multistep-vertical',
@@ -127,6 +130,6 @@ const fields: JsonSchemaProps = {
   },
 };
 
-export const getFieldProps = (): Promise<JsonSchemaProps> => {
-  return new Promise((res) => setTimeout(() => res(fields), 1000));
+export const getFieldProps = async (): Promise<JsonSchemaProps> => {
+  return await sleep().then(() => fields);
 };

@@ -1,4 +1,4 @@
-import type {FieldProps} from '../form-fields';
+import type {FieldProps} from '../../contexts/form-fields';
 import {useFormContext} from 'react-hook-form';
 import {ErrorMessage, FieldSection} from './common';
 

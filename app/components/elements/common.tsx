@@ -1,5 +1,5 @@
 import type {PropsWithChildren} from 'react';
-import type {SectionProps} from '../form-fields';
+import type {SectionProps} from '../../contexts/form-fields';
 import cn from 'classnames';
 import {HFTextInput} from './hf-text';
 import {HFSelectInput} from './hf-select';
