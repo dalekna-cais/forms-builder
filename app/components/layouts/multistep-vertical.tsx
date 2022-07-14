@@ -1,3 +1,4 @@
+import React from 'react';
 import type {JsonSectionProps} from '../../contexts/form-fields';
 import {useFormFieldsContext} from '../../contexts/form-fields';
 import cn from 'classnames';
@@ -5,13 +6,22 @@ import {FormProvider, useForm} from 'react-hook-form';
 import {FieldsMatcher} from '../elements/common';
 import {MultistepProvider, useMultistepActor} from '~/contexts/multistep-form';
 
-// QUESTION: do we submit to db on each step or is there a final submit?
-
-const Form = ({defs}: {defs: JsonSectionProps}) => {
+type FormProps = {defs: JsonSectionProps};
+const Form = ({defs}: FormProps) => {
   const [state, send] = useMultistepActor();
   const {getSections, defaultValuesPerSection} = useFormFieldsContext();
-  // NOTE: most likely defaultValues will come from the parent master state
-  const methods = useForm({defaultValues: defaultValuesPerSection[defs.title]}); // should be defs.id, not title.
+  // default values loaded from state machine and matched with section fields
+  const [defaultValues] = React.useState(() =>
+    // FIX: should look up by defs.id, not title.
+    Object.keys(defaultValuesPerSection[defs.title]).reduce(
+      (acc, key) => ({
+        ...acc,
+        [key]: state.context[key],
+      }),
+      {},
+    ),
+  );
+  const methods = useForm({defaultValues});
   const formSections = getSections(methods).sections;
   const section = formSections.find((section) => section.title === defs.title);
 
@@ -51,20 +61,15 @@ const Form = ({defs}: {defs: JsonSectionProps}) => {
   );
 };
 
-const Section = ({
-  defs,
-  count,
-  name,
-}: {
+type SectionProps = {
   defs: JsonSectionProps;
   count: number;
   name: string;
-}) => {
+};
+const Section = ({defs, count, name}: SectionProps) => {
   const [state] = useMultistepActor();
   const {definitions} = useFormFieldsContext();
   const isNotLast = Object.keys(definitions).length !== count;
-
-  // NOTE: only one form can be open at a time, come up with a dynamic state machine
 
   return (
     <div key={defs.title} className="flex">

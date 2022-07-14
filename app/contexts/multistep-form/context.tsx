@@ -19,13 +19,13 @@ export const MultistepProvider = ({children}: MultistepProviderProps) => {
   const {definitions, defaultValues} = useFormFieldsContext();
   const formNames = Object.keys(definitions);
   const [fieldStates] = React.useState(() =>
-    formNames.reduce((acc, key, index, array) => {
+    formNames.reduce((acc, state, index, array) => {
       const prevState = array[index - 1];
       const nextState = array[index + 1];
 
       return {
         ...acc,
-        [key]: {
+        [state]: {
           on: {
             back: prevState,
             next: {
@@ -56,7 +56,7 @@ export const MultistepProvider = ({children}: MultistepProviderProps) => {
             },
           },
           complete: {
-            entry: [() => console.log('complete')],
+            entry: [(context) => console.log('complete', context)],
           },
           error: {
             entry: [() => console.log('error')],

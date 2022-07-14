@@ -18,8 +18,8 @@ export const HFSelectInput = ({field}: {field: FieldProps}) => {
             <Downshift
               id={field.name}
               initialSelectedItem={
-                field.options?.value &&
-                field.items?.find((item) => item.value === field.options?.value)
+                rhfField?.value &&
+                field.items?.find((item) => item.value === rhfField?.value)
               }
               itemToString={(item) => (item ? item.label : '')}
               onChange={({value}) => rhfField.onChange({target: {value}})}
