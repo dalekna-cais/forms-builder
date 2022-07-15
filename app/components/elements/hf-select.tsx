@@ -56,13 +56,18 @@ export const HFSelectInput = ({field}: {field: FieldProps}) => {
                     >
                       <input
                         className="form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-r-0 border-gray-300 rounded rounded-r-none transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none h-[38px]"
-                        {...getInputProps({})}
+                        {...getInputProps({
+                          name: rhfField.name,
+                          ref: rhfField.ref,
+                        })}
                         autoComplete="off"
+                        disabled={field.options?.disabled}
                       />
                       <button
                         aria-label={'toggle menu'}
                         className="px-2 border border-l-0 rounded-r border-gray-300"
                         type="button"
+                        disabled={field.options?.disabled}
                         {...getToggleButtonProps()}
                       >
                         {isOpen ? <>&#8593;</> : <>&#8595;</>}

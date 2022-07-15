@@ -4,6 +4,12 @@ import type {ActorRef, State} from 'xstate';
 import {assign, createMachine} from 'xstate';
 import {useFormFieldsContext} from '../form-fields';
 
+type MultistepFormContext = Record<string, any>;
+type MultistepFormEvents =
+  | {type: 'restart'}
+  | {type: 'back'}
+  | {type: 'next'; values: MultistepFormContext};
+
 export type MultistepContextProps = {
   service: any;
 };
@@ -13,7 +19,7 @@ export const MultistepContext = React.createContext<MultistepContextProps>(
 
 export interface MultistepProviderProps {
   children: Function | React.ReactNode;
-  onSubmit: (context: any) => Promise<any>;
+  onSubmit: (context: MultistepFormContext) => Promise<any>;
 }
 export const MultistepProvider = ({
   children,
@@ -33,7 +39,10 @@ export const MultistepProvider = ({
             back: prevState,
             next: {
               target: nextState ?? 'submitting',
-              actions: assign<any>((context, event: any) => {
+              actions: assign<
+                MultistepFormContext,
+                {type: 'next'; values: MultistepFormContext}
+              >((context, event) => {
                 const values = event?.values ?? {};
                 return {...context, ...values};
               }),
@@ -44,7 +53,7 @@ export const MultistepProvider = ({
     }, {}),
   );
   const multistepFormMachine = React.useRef(
-    createMachine(
+    createMachine<MultistepFormContext, MultistepFormEvents>(
       {
         initial: formNames[0],
         context: defaultValues,
@@ -63,6 +72,9 @@ export const MultistepProvider = ({
           },
           error: {
             entry: [() => console.log('error')],
+            on: {
+              restart: formNames[0],
+            },
           },
         },
       },
@@ -94,10 +106,10 @@ const useMultistepContext = () => {
   return utils;
 };
 
-type MultistepFormEvents =
-  | {type: 'back'}
-  | {type: 'next'; values: Record<string, any>};
-export type MultistepActorRef = ActorRef<MultistepFormEvents, State<any, any>>;
+export type MultistepActorRef = ActorRef<
+  MultistepFormEvents,
+  State<MultistepFormContext, MultistepFormEvents>
+>;
 
 export const useMultistepActor = () => {
   const {service} = useMultistepContext();

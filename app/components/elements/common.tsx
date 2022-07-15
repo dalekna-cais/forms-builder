@@ -4,6 +4,7 @@ import cn from 'classnames';
 import {HFTextInput} from './hf-text';
 import {HFSelectInput} from './hf-select';
 import {HFPasswordInput} from './hf-password';
+import {mergeDeepRight} from 'ramda';
 
 export const ErrorMessage = ({error}: {error: any}) => {
   return (
@@ -38,12 +39,27 @@ export const FieldSection = ({
   return <div className={cn('w-full', className)}>{children}</div>;
 };
 
-export const FieldsMatcher = ({section}: {section: SectionProps}) => {
+type FieldsMatcherProps = {
+  section: SectionProps;
+  disableAllFields?: boolean;
+};
+export const FieldsMatcher = ({
+  section,
+  disableAllFields,
+}: FieldsMatcherProps) => {
   return (
     <div className={cn(`grid grid-cols-${section.columns ?? 1} gap-4`)}>
       {section.fields
         .sort((a, b) => a.order - b.order)
-        .map((field) => {
+        .map((originalField) => {
+          let field = originalField;
+
+          if (disableAllFields) {
+            field = mergeDeepRight(field, {
+              options: {disabled: true},
+            });
+          }
+
           switch (field.type) {
             case 'text':
               return <HFTextInput key={field.name} field={field} />;

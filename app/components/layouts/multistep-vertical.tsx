@@ -26,6 +26,12 @@ const Form = ({defs}: FormProps) => {
   const formSections = getSections(methods).sections;
   const section = formSections.find((section) => section.title === defs.title);
 
+  /** focus first input of the form */
+  React.useEffect(() => {
+    const firstInputName = Object.keys(defaultValues)[0];
+    methods?.setFocus(firstInputName as never);
+  }, [methods, defaultValues]);
+
   if (!section)
     return <div>there was an error looking up section by title!</div>;
 
@@ -37,7 +43,10 @@ const Form = ({defs}: FormProps) => {
         )}
       >
         <div className="mt-5 max-w-[70%]">
-          <FieldsMatcher section={section} />
+          <FieldsMatcher
+            section={section}
+            disableAllFields={state.matches('submitting')}
+          />
         </div>
         <footer className="flex my-5">
           <button
@@ -96,10 +105,36 @@ const Section = ({defs, count, name}: SectionProps) => {
 };
 
 const MultistepForm = () => {
+  const [state, send] = useMultistepActor();
   const {definitions} = useFormFieldsContext();
 
+  if (state.matches('complete')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[500px]">
+        <h1 className="font-semibold text-5xl">{`Success 🎉`}</h1>
+        <pre className="mt-5 p-5 bg-gray-100 rounded">
+          {JSON.stringify(state.context, null, 2)}
+        </pre>
+      </div>
+    );
+  }
+  if (state.matches('error')) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[500px]">
+        <h1 className="font-semibold text-5xl">{`There was an error 💥`}</h1>
+        <button
+          type="button"
+          onClick={() => send({type: 'restart'})}
+          className="mt-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full max-w-[1000px] min-w-[750px] border p-10">
+    <>
       {Object.keys(definitions).map((key, index) => {
         const count = index + 1;
         const defs = definitions[key];
@@ -107,7 +142,7 @@ const MultistepForm = () => {
           <Section key={defs.title} name={key} defs={defs} count={count} />
         );
       })}
-    </div>
+    </>
   );
 };
 
@@ -116,7 +151,9 @@ export const MultistepVertical = () => {
     <MultistepProvider
       onSubmit={(values) => sleep(2500).then(() => console.log({values}))}
     >
-      <MultistepForm />
+      <div className="w-full max-w-[1000px] min-w-[750px] border p-10">
+        <MultistepForm />
+      </div>
     </MultistepProvider>
   );
 };
