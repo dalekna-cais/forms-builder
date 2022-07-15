@@ -95,6 +95,7 @@ const fields: JsonSchemaProps = {
     cryptoPortfolio: {
       title: 'Crypto Portfolio',
       columns: 2,
+      validateAt: 'https://some-custom-validation-endpoint.com',
       fields: {
         coin1: {
           label: 'Coin',

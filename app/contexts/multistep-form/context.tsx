@@ -47,8 +47,8 @@ export const MultistepProvider = ({
       const nextState: string | undefined = array[index + 1];
 
       let nextTarget = '';
-      // TODO: final section also has to be validated before submitting full request
-      if (nextState && values.validateAt) {
+
+      if (values.validateAt) {
         nextTarget = validationState;
       } else if (nextState) {
         nextTarget = nextState;
@@ -60,7 +60,7 @@ export const MultistepProvider = ({
         [validationState]: {
           invoke: {
             src: 'onStepValidation',
-            onDone: nextState,
+            onDone: nextState ?? 'submitting', // if we're in final state and no next state, pass on to submitting
             onError: {
               target: currState,
               actions: assign<MultistepFormContext, any>({
