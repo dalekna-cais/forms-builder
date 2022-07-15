@@ -150,7 +150,10 @@ export const MultistepVertical = () => {
   return (
     <MultistepProvider
       onSubmit={(values) => sleep(2500).then(() => console.log({values}))}
-      onStepValidation={() => sleep(500)}
+      onStepValidation={() => sleep(1000)}
+      // onStepValidation={() =>
+      //   sleep(1000).then(() => Promise.reject({email: 'already exists'}))
+      // }
     >
       <div className="w-full max-w-[1000px] min-w-[750px] border p-10">
         <MultistepForm />

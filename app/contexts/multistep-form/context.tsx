@@ -41,12 +41,13 @@ export const MultistepProvider = ({
   const [fieldStates] = React.useState(() =>
     formNames.reduce((acc, state, index, array) => {
       const values = definitions[state];
-      const validationState = `${state}_validate`;
+      const validationState = `${state}:validate`;
+      const currState: string | undefined = array[index];
       const prevState: string | undefined = array[index - 1];
       const nextState: string | undefined = array[index + 1];
 
       let nextTarget = '';
-
+      // TODO: final section also has to be validated before submitting full request
       if (nextState && values.validateAt) {
         nextTarget = validationState;
       } else if (nextState) {
@@ -55,13 +56,13 @@ export const MultistepProvider = ({
         nextTarget = 'submitting';
       }
 
-      const sectionValidation = {
+      const validateAtState = {
         [validationState]: {
           invoke: {
             src: 'onStepValidation',
             onDone: nextState,
             onError: {
-              target: prevState,
+              target: currState,
               actions: assign<MultistepFormContext, any>({
                 errors: (context, event) => event.data,
               }),
@@ -91,11 +92,10 @@ export const MultistepProvider = ({
             },
           },
         },
-        ...(values.validateAt && sectionValidation),
+        ...(values.validateAt && validateAtState),
       };
     }, {}),
   );
-  console.log(fieldStates);
   const multistepFormMachine = React.useRef(
     createMachine<MultistepFormContext, MultistepFormEvents>({
       initial: formNames[0],
