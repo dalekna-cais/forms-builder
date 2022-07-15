@@ -36,6 +36,7 @@ export type SectionProps = {
   id: string;
   title: string;
   columns?: number;
+  validateAt?: string;
   fields: FieldProps[];
 };
 export type FormFieldsContextProps = {
@@ -58,6 +59,7 @@ export interface JsonFieldProps extends Omit<FieldProps, 'name' | 'options'> {
 export type JsonSectionProps = {
   title: string;
   columns?: number;
+  validateAt?: string;
   fields: {
     [key: string]: JsonFieldProps;
   };

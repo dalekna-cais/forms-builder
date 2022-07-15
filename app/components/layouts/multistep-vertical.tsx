@@ -17,7 +17,7 @@ const Form = ({defs}: FormProps) => {
     Object.keys(defaultValuesPerSection[defs.title]).reduce(
       (acc, key) => ({
         ...acc,
-        [key]: state.context[key],
+        [key]: state.context.values[key],
       }),
       {},
     ),
@@ -150,6 +150,7 @@ export const MultistepVertical = () => {
   return (
     <MultistepProvider
       onSubmit={(values) => sleep(2500).then(() => console.log({values}))}
+      onStepValidation={() => sleep(500)}
     >
       <div className="w-full max-w-[1000px] min-w-[750px] border p-10">
         <MultistepForm />

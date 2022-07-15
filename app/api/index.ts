@@ -10,6 +10,7 @@ const fields: JsonSchemaProps = {
     personalDetails: {
       title: 'Personal Details',
       columns: 2,
+      validateAt: 'https://some-custom-validation-endpoint.com',
       fields: {
         name: {
           label: 'Name',
