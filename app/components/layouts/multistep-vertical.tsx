@@ -7,8 +7,8 @@ import {FieldsMatcher} from '../elements/common';
 import {MultistepProvider, useMultistepActor} from '~/contexts/multistep-form';
 import {sleep} from '~/api';
 
-type FormProps = {defs: JsonSectionProps};
-const Form = ({defs}: FormProps) => {
+type FormProps = {defs: JsonSectionProps; name: string};
+const Form = ({defs, name}: FormProps) => {
   const [state, send] = useMultistepActor();
   const {getSections, defaultValuesPerSection} = useFormFieldsContext();
   // default values loaded from state machine and matched with section fields
@@ -25,6 +25,7 @@ const Form = ({defs}: FormProps) => {
   const methods = useForm({defaultValues});
   const formSections = getSections(methods).sections;
   const section = formSections.find((section) => section.title === defs.title);
+  const isValidating = ['submitting', `${name}:validate`].some(state.matches);
 
   /** focus first input of the form */
   React.useEffect(() => {
@@ -43,20 +44,17 @@ const Form = ({defs}: FormProps) => {
         )}
       >
         <div className="mt-5 max-w-[70%]">
-          <FieldsMatcher
-            section={section}
-            disableAllFields={state.matches('submitting')}
-          />
+          <FieldsMatcher section={section} disableAllFields={isValidating} />
         </div>
         <footer className="flex my-5">
           <button
             type="submit"
-            disabled={state.matches('submitting')}
+            disabled={isValidating}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3"
           >
             {state.matches('submitting') ? 'Submitting' : 'Next'}
           </button>
-          {!state.matches('submitting') && (
+          {!isValidating && (
             <button
               type="button"
               onClick={() => send({type: 'back'})}
@@ -96,8 +94,12 @@ const Section = ({defs, count, name}: SectionProps) => {
           <h1 className="text-xl font-semibold">{defs.title}</h1>
         </div>
         <div className={cn(isNotLast && 'min-h-[24px]')}>
-          {state.matches(name) && <Form defs={defs} />}
-          {state.matches('submitting') && !isNotLast && <Form defs={defs} />}
+          {[name, `${name}:validate`].some(state.matches) && (
+            <Form name={name} defs={defs} />
+          )}
+          {state.matches('submitting') && !isNotLast && (
+            <Form name={name} defs={defs} />
+          )}
         </div>
       </div>
     </div>
@@ -113,7 +115,7 @@ const MultistepForm = () => {
       <div className="flex flex-col items-center justify-center min-h-[500px]">
         <h1 className="font-semibold text-5xl">{`Success 🎉`}</h1>
         <pre className="mt-5 p-5 bg-gray-100 rounded">
-          {JSON.stringify(state.context, null, 2)}
+          {JSON.stringify(state.context.values, null, 2)}
         </pre>
       </div>
     );
@@ -134,7 +136,7 @@ const MultistepForm = () => {
   }
 
   return (
-    <>
+    <div className="w-full max-w-[1000px] min-w-[750px] border p-10">
       {Object.keys(definitions).map((key, index) => {
         const count = index + 1;
         const defs = definitions[key];
@@ -142,7 +144,7 @@ const MultistepForm = () => {
           <Section key={defs.title} name={key} defs={defs} count={count} />
         );
       })}
-    </>
+    </div>
   );
 };
 
@@ -150,14 +152,12 @@ export const MultistepVertical = () => {
   return (
     <MultistepProvider
       onSubmit={(values) => sleep(2500).then(() => console.log({values}))}
-      onStepValidation={() => sleep(1000)}
-      // onStepValidation={() =>
+      onStepValidation={(values) => sleep(1000)}
+      // onStepValidation={(values) =>
       //   sleep(1000).then(() => Promise.reject({email: 'already exists'}))
       // }
     >
-      <div className="w-full max-w-[1000px] min-w-[750px] border p-10">
-        <MultistepForm />
-      </div>
+      <MultistepForm />
     </MultistepProvider>
   );
 };
