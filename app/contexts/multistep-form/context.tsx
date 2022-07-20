@@ -3,6 +3,15 @@ import {useActor, useMachine} from '@xstate/react';
 import type {ActorRef, State} from 'xstate';
 import {assign, createMachine} from 'xstate';
 import {useFormFieldsContext} from '../form-fields';
+import {inspect} from '@xstate/inspect';
+
+if (typeof window !== 'undefined') {
+  inspect({
+    // options
+    // url: 'https://stately.ai/viz?inspect', // (default)
+    iframe: false, // open in new window
+  });
+}
 
 type MultistepFormContext = {
   /** all values */
@@ -36,6 +45,7 @@ export const MultistepProvider = ({
   onSubmit,
   onStepValidation,
 }: MultistepProviderProps) => {
+  // NOTE: we could subscribe to the react-hook-form here and listen for errors, add guards to the state machine
   const {definitions, defaultValues} = useFormFieldsContext();
   const formNames = Object.keys(definitions);
   const [fieldStates] = React.useState(() =>
@@ -129,6 +139,7 @@ export const MultistepProvider = ({
       onSubmit,
       onStepValidation,
     },
+    devTools: true,
   });
 
   const forwardProps = {service};
