@@ -4,11 +4,20 @@ import type {ActorRef, State} from 'xstate';
 import {assign, createMachine} from 'xstate';
 import {useFormFieldsContext} from '../form-fields';
 
-type MultistepFormContext = Record<string, any>;
+type MultistepFormContext = {
+  /** all values */
+  values: Record<string, any>;
+  /** internal use only */
+  prevState?: string;
+  /** internal use only */
+  nextState?: string;
+  /** errors for section */
+  errors?: Record<string, any>;
+};
 type MultistepFormEvents =
   | {type: 'restart'}
   | {type: 'back'}
-  | {type: 'next'; values: MultistepFormContext};
+  | {type: 'next'; values: MultistepFormContext['values']};
 
 export type MultistepContextProps = {
   service: any;
@@ -20,17 +29,47 @@ export const MultistepContext = React.createContext<MultistepContextProps>(
 export interface MultistepProviderProps {
   children: Function | React.ReactNode;
   onSubmit: (context: MultistepFormContext) => Promise<any>;
+  onStepValidation?: (context: MultistepFormContext) => Promise<any>;
 }
 export const MultistepProvider = ({
   children,
   onSubmit,
+  onStepValidation,
 }: MultistepProviderProps) => {
   const {definitions, defaultValues} = useFormFieldsContext();
   const formNames = Object.keys(definitions);
   const [fieldStates] = React.useState(() =>
     formNames.reduce((acc, state, index, array) => {
-      const prevState = array[index - 1];
-      const nextState = array[index + 1];
+      const values = definitions[state];
+      const validationState = `${state}:validate`;
+      const currState: string | undefined = array[index];
+      const prevState: string | undefined = array[index - 1];
+      const nextState: string | undefined = array[index + 1];
+
+      let nextTarget = '';
+
+      if (values.validateAt) {
+        nextTarget = validationState;
+      } else if (nextState) {
+        nextTarget = nextState;
+      } else {
+        nextTarget = 'submitting';
+      }
+
+      const validateAtState = {
+        [validationState]: {
+          invoke: {
+            src: 'onStepValidation',
+            onDone: nextState ?? 'submitting', // if we're in final state and no next state, pass on to submitting
+            onError: {
+              target: currState,
+              actions: assign<MultistepFormContext, any>({
+                errors: (context, event) => event.data,
+              }),
+            },
+          },
+        },
+      };
 
       return {
         ...acc,
@@ -38,54 +77,59 @@ export const MultistepProvider = ({
           on: {
             back: prevState,
             next: {
-              target: nextState ?? 'submitting',
+              target: nextTarget,
               actions: assign<
                 MultistepFormContext,
                 {type: 'next'; values: MultistepFormContext}
-              >((context, event) => {
-                const values = event?.values ?? {};
-                return {...context, ...values};
+              >({
+                values: (context, event) => {
+                  const values = event?.values ?? {};
+                  return {...context.values, ...values};
+                },
+                prevState: (context) => prevState,
+                nextState: (context) => nextState,
               }),
             },
           },
         },
+        ...(values.validateAt && validateAtState),
       };
     }, {}),
   );
   const multistepFormMachine = React.useRef(
-    createMachine<MultistepFormContext, MultistepFormEvents>(
-      {
-        initial: formNames[0],
-        context: defaultValues,
-        states: {
-          ...fieldStates,
-          submitting: {
-            entry: [() => console.log('submitting')],
-            invoke: {
-              src: 'onSubmit',
-              onDone: 'complete',
-              onError: 'error',
-            },
+    createMachine<MultistepFormContext, MultistepFormEvents>({
+      initial: formNames[0],
+      context: {
+        values: defaultValues,
+      },
+      states: {
+        ...fieldStates,
+        submitting: {
+          entry: [() => console.log('submitting')],
+          invoke: {
+            src: 'onSubmit',
+            onDone: 'complete',
+            onError: 'error',
           },
-          complete: {
-            entry: [() => console.log('complete')],
-          },
-          error: {
-            entry: [() => console.log('error')],
-            on: {
-              restart: formNames[0],
-            },
+        },
+        complete: {
+          entry: [() => console.log('complete')],
+        },
+        error: {
+          entry: [() => console.log('error')],
+          on: {
+            restart: formNames[0],
           },
         },
       },
-      {
-        services: {
-          onSubmit,
-        },
-      },
-    ),
+    }),
   );
-  const [, , service] = useMachine(multistepFormMachine.current);
+  const [, , service] = useMachine(multistepFormMachine.current, {
+    services: {
+      onSubmit,
+      onStepValidation,
+    },
+  });
 
   const forwardProps = {service};
   const ui = typeof children === 'function' ? children(forwardProps) : children;
